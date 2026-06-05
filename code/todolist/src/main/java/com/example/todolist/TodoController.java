@@ -35,4 +35,12 @@ public class TodoController {
         return "redirect:/";
     }
 
+    // Teendő elvégzésének dokumentálása
+    @GetMapping("/kesz/{id}")
+    public String kesz(@PathVariable Long id){
+        Todo todo = todoRepository.findById(id).orElseThrow();
+        todo.setKesz(true);
+        todoRepository.save(todo);
+        return "redirect:/";
+    }
 }
