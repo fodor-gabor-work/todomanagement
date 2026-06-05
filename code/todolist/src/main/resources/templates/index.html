@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Teendőlista</title>
+    <style>
+        body{ font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto;}
+        input{ padding: 8px; margin: 5px; width:200px;}
+        button { padding: 8px 16px; background:#4CAF50; color: white; border: none; cursor: pointer;}
+        table { width: 100%; border-collapse: collapse; margin-top:20px;}
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left;}
+        a { color: red, text-decoration: none;}
+    </style>
+</head>
+<body>
+    <h1>Teendőlista</h1>
+    <form action="/hozzaad" method = "post">
+        <input type="text" name="cim" placeholder="Teendő címe" required/>
+        <input type="text" name="leiras" placeholder="Teendő leírása">
+        <button type="submit">Hozzáad</button>
+    </form>
+
+    <table>
+        <tr>
+            <th>Cím</th>
+            <th>Leírás</th>
+            <th>Törlés</th>
+        </tr>
+        <tr th:each="todo : ${todok}">
+            <td th:text="${todo.cim}"></td>
+            <td th:text="${todo.leiras}"></td>
+            <td><a th:href ="@{/torol/{id}(id=${todo.id})}">Törlés</a></td>
+        </tr>
+    </table>
+</body>
+</html>
