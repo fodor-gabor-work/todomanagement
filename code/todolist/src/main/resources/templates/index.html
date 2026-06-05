@@ -10,6 +10,7 @@
         table { width: 100%; border-collapse: collapse; margin-top:20px;}
         th, td { padding: 10px; border: 1px solid #ddd; text-align: left;}
         a { color: red, text-decoration: none;}
+        .kesz{ text-decoration:line-through; color: gray;}
     </style>
 </head>
 <body>
@@ -25,11 +26,16 @@
             <th>Cím</th>
             <th>Leírás</th>
             <th>Törlés</th>
+            <th>Műveletek</th>
         </tr>
         <tr th:each="todo : ${todok}">
             <td th:text="${todo.cim}"></td>
             <td th:text="${todo.leiras}"></td>
-            <td><a th:href ="@{/torol/{id}(id=${todo.id})}">Törlés</a></td>
+            <td th:text="${todo.kesz} ? 'igen' : 'nem'"></td>
+            <td>
+                <a th:href ="@{/torol/{id}(id=${todo.id})}">Törlés</a>
+                <a th:href="@{/kesz/{id}(id=${todo.id})}">Kész</a>
+            </td>
         </tr>
     </table>
 </body>
