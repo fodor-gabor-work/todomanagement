@@ -9,10 +9,12 @@ public class TodoController {
     // Dependence injection
     private final TodoRepository todoRepository;
     private final EmailSzolgaltatas emailSzolgaltatas;
+    private final GoogleNaptarSzolgaltatas googleNaptarSzolgaltatas;
 
-    public TodoController(TodoRepository todoRepository, EmailSzolgaltatas emailSzolgaltatas){
+    public TodoController(TodoRepository todoRepository, EmailSzolgaltatas emailSzolgaltatas, GoogleNaptarSzolgaltatas googleNaptarSzolgaltatas){
         this.todoRepository =todoRepository;
         this.emailSzolgaltatas = emailSzolgaltatas;
+        this.googleNaptarSzolgaltatas = googleNaptarSzolgaltatas;
     }
 
     // Teendők lekérése a meglévő listából
@@ -24,15 +26,22 @@ public class TodoController {
 
     // Új teendő hozzáadása
     @PostMapping("/hozzaad")
-    public String hozzaad(String cim, String leiras, String email){
+    public String hozzaad(String cim, String leiras, String email) {
         Todo todo = new Todo();
         todo.setCim(cim);
         todo.setLeiras(leiras);
         todoRepository.save(todo);
 
-        if(email != null && !email.isEmpty()){
-            emailSzolgaltatas.kuldEmail(email,cim,leiras);
+        if (email != null && !email.isEmpty()) {
+            emailSzolgaltatas.kuldEmail(email, cim, leiras);
         }
+
+        try {
+            googleNaptarSzolgaltatas.addNaptarEsemeny(cim, leiras);
+        } catch (Exception e) {
+            System.out.println("Naptár hiba: " + e.getMessage());
+        }
+
         return "redirect:/";
     }
 
