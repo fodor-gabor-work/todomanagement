@@ -8,9 +8,13 @@ import org.springframework.web.bind.annotation.*;
 public class TodoController {
     // Dependence injection
     private final TodoRepository todoRepository;
-    public TodoController(TodoRepository todoRepository){
+    private final EmailSzolgaltatas emailSzolgaltatas;
+
+    public TodoController(TodoRepository todoRepository, EmailSzolgaltatas emailSzolgaltatas){
         this.todoRepository =todoRepository;
+        this.emailSzolgaltatas = emailSzolgaltatas;
     }
+
     // Teendők lekérése a meglévő listából
     @GetMapping("/")
     public String lista(Model model){
@@ -20,11 +24,15 @@ public class TodoController {
 
     // Új teendő hozzáadása
     @PostMapping("/hozzaad")
-    public String hozzaad(String cim, String leiras){
+    public String hozzaad(String cim, String leiras, String email){
         Todo todo = new Todo();
         todo.setCim(cim);
         todo.setLeiras(leiras);
         todoRepository.save(todo);
+
+        if(email != null && !email.isEmpty()){
+            emailSzolgaltatas.kuldEmail(email,cim,leiras);
+        }
         return "redirect:/";
     }
 
