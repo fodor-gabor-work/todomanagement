@@ -3,71 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <title>Teendőlista</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; }
-        input, select { padding: 8px; margin: 5px; width: 200px; }
-        button { padding: 8px 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-        a { color: red; text-decoration: none; }
+        body { background-color: #f8f9fa; }
+        .card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .kesz { text-decoration: line-through; color: gray; }
-        h2 { margin-top: 30px; }
     </style>
 </head>
 <body>
-<h1>Teendőlista</h1>
+<div class="container py-5">
+    <!-- Kijelentkezes-->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary"><i class="bi bi-check2-square"></i> Teendőlista</h1>
+        <div>
+            <span class="me-3" th:text="'Üdv, ' + ${#authentication.name} + '!'"></span>
+            <a href="/logout" class="btn btn-outline-danger">
+                <i class="bi bi-box-arrow-right"></i> Kijelentkezés
+            </a>
+        </div>
+    </div>
+    <!-- Új teendő -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Új teendő hozzáadása</div>
+        <div class="card-body">
+            <form action="/hozzaad" method="post" class="row g-2">
+                <div class="col-md-3">
+                    <input type="text" name="cim" class="form-control" placeholder="Teendő címe" required/>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="leiras" class="form-control" placeholder="Leírás"/>
+                </div>
+                <div class="col-md-2">
+                    <input type="email" name="email" class="form-control" placeholder="Email cím"/>
+                </div>
+                <div class="col-md-2">
+                    <input type="datetime-local" name="hatarido" class="form-control"/>
+                </div>
+                <div class="col-md-1">
+                    <select name="csoportId" class="form-select">
+                        <option value="">-- Csoport --</option>
+                        <option th:each="csoport : ${csoportok}" th:value="${csoport.id}" th:text="${csoport.nev}"></option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-lg"></i> Add
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-<h2>Új teendő</h2>
-<form action="/hozzaad" method="post">
-    <input type="text" name="cim" placeholder="Teendő címe" required/>
-    <input type="text" name="leiras" placeholder="Leírás"/>
-    <input type="email" name="email" placeholder="Email cím"/>
-    <input type="datetime-local" name="hatarido"/>
-    <select name="csoportId">
-        <option value="">-- Nincs csoport --</option>
-        <option th:each="csoport : ${csoportok}" th:value="${csoport.id}" th:text="${csoport.nev}"></option>
-    </select>
-    <button type="submit">Hozzáad</button>
-</form>
+    <!-- Teendők táblázat -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">Teendők</div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                <tr>
+                    <th>Cím</th>
+                    <th>Leírás</th>
+                    <th>Határidő</th>
+                    <th>Kész</th>
+                    <th>Műveletek</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="todo : ${todok}">
+                    <td th:text="${todo.cim}" th:class="${todo.kesz} ? 'kesz' : ''"></td>
+                    <td th:text="${todo.leiras}"></td>
+                    <td th:text="${todo.hatarido != null} ? ${todo.hatarido.toString().replace('T', ' ').substring(0, 16)} : 'Nincs határidő'"></td>
+                    <td th:text="${todo.kesz} ? '✅' : '❌'"></td>
+                    <td>
+                        <a th:href="@{/kesz/{id}(id=${todo.id})}" class="btn btn-sm btn-success">
+                            <i class="bi bi-check-lg"></i> Kész
+                        </a>
+                        <a th:href="@{/torol/{id}(id=${todo.id})}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Törlés
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<table>
-    <tr>
-        <th>Cím</th>
-        <th>Leírás</th>
-        <th>Határidő</th>
-        <th>Kész</th>
-        <th>Műveletek</th>
-    </tr>
-    <tr th:each="todo : ${todok}">
-        <td th:text="${todo.cim}" th:class="${todo.kesz} ? 'kesz' : ''"></td>
-        <td th:text="${todo.leiras}"></td>
-        <td th:text="${todo.hatarido != null} ? ${todo.hatarido.toString().replace('T', ' ').substring(0, 16)} : 'Nincs határidő'"></td>
-        <td th:text="${todo.kesz} ? 'igen' : 'nem'"></td>
-        <td>
-            <a th:href="@{/kesz/{id}(id=${todo.id})}">Kész</a> |
-            <a th:href="@{/torol/{id}(id=${todo.id})}">Törlés</a>
-        </td>
-    </tr>
-</table>
+    <!-- Csoportok -->
+    <div class="card">
+        <div class="card-header bg-warning">Csoportok kezelése</div>
+        <div class="card-body">
+            <form action="/csoport/hozzaad" method="post" class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <input type="text" name="nev" class="form-control" placeholder="Csoport neve" required/>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" name="emailek" class="form-control" placeholder="email1@x.com,email2@x.com"/>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-warning w-100">
+                        <i class="bi bi-people"></i> Létrehoz
+                    </button>
+                </div>
+            </form>
 
-<h2>Csoportok</h2>
-<form action="/csoport/hozzaad" method="post">
-    <input type="text" name="nev" placeholder="Csoport neve" required/>
-    <input type="text" name="emailek" placeholder="email1@x.com,email2@x.com"/>
-    <button type="submit">Csoport létrehozása</button>
-</form>
-
-<table>
-    <tr>
-        <th>Csoport neve</th>
-        <th>Email címek</th>
-        <th>Törlés</th>
-    </tr>
-    <tr th:each="csoport : ${csoportok}">
-        <td th:text="${csoport.nev}"></td>
-        <td th:text="${csoport.emailCimek}"></td>
-        <td><a th:href="@{/csoport/torol/{id}(id=${csoport.id})}">Törlés</a></td>
-    </tr>
-</table>
+            <table class="table table-hover">
+                <thead class="table-light">
+                <tr>
+                    <th>Csoport neve</th>
+                    <th>Email címek</th>
+                    <th>Törlés</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="csoport : ${csoportok}">
+                    <td th:text="${csoport.nev}"></td>
+                    <td th:text="${csoport.emailCimek}"></td>
+                    <td>
+                        <a th:href="@{/csoport/torol/{id}(id=${csoport.id})}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Törlés
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

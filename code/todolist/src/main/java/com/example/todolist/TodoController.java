@@ -94,4 +94,9 @@ public class TodoController {
         csoportRepository.deleteById(id);
         return "redirect:/";
     }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
 }
