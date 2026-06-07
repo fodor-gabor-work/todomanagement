@@ -19,6 +19,7 @@
         <input type="text" name="cim" placeholder="Teendő címe" required/>
         <input type="text" name="leiras" placeholder="Teendő leírása"/>
         <input type="email" name="email" placeholder="Értesítendő email cím/">
+        <input type="datetime-local" name="hatarido"/>
         <button type="submit">Hozzáad</button>
     </form>
 
@@ -26,12 +27,14 @@
         <tr>
             <th>Cím</th>
             <th>Leírás</th>
-            <th>Törlés</th>
+            <th>Határidő</th>
+            <th>Kész</th>
             <th>Műveletek</th>
         </tr>
         <tr th:each="todo : ${todok}">
-            <td th:text="${todo.cim}"></td>
+            <td th:text="${todo.cim}" th:class="${todo.kesz} ? 'kész' : ''"></td>
             <td th:text="${todo.leiras}"></td>
+            <td th:text="${todo.hatarido != null} ? ${todo.hatarido.toString().replace('T', ' ').substring(0, 16)} : 'Nincs határidő'"></td>
             <td th:text="${todo.kesz} ? 'igen' : 'nem'"></td>
             <td>
                 <a th:href ="@{/torol/{id}(id=${todo.id})}">Törlés</a>

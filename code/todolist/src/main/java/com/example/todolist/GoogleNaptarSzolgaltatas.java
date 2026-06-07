@@ -74,4 +74,33 @@ public class GoogleNaptarSzolgaltatas {
 
         service.events().insert("primary", event).execute();
     }
+
+    public void addNaptarEsemeny(String cim, String leiras, java.time.LocalDateTime hatarido) throws IOException, GeneralSecurityException {
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+        Event event = new Event()
+                .setSummary(cim)
+                .setDescription(leiras);
+
+        DateTime startDateTime = new DateTime(new Date());
+        EventDateTime start = new EventDateTime().setDateTime(startDateTime).setTimeZone("Europe/Budapest");
+        event.setStart(start);
+
+        // Ha van határidő, azt használjuk, különben +1 óra
+        Date vegDatum;
+        if (hatarido != null) {
+            vegDatum = java.util.Date.from(hatarido.atZone(java.time.ZoneId.of("Europe/Budapest")).toInstant());
+        } else {
+            vegDatum = new Date(System.currentTimeMillis() + 3600000);
+        }
+
+        DateTime endDateTime = new DateTime(vegDatum);
+        EventDateTime end = new EventDateTime().setDateTime(endDateTime).setTimeZone("Europe/Budapest");
+        event.setEnd(end);
+
+        service.events().insert("primary", event).execute();
+    }
 }

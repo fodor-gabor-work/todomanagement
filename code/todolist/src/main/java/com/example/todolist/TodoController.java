@@ -26,10 +26,15 @@ public class TodoController {
 
     // Új teendő hozzáadása
     @PostMapping("/hozzaad")
-    public String hozzaad(String cim, String leiras, String email) {
+    public String hozzaad(String cim, String leiras, String email,
+                          @RequestParam(required = false) String hatarido) {
         Todo todo = new Todo();
         todo.setCim(cim);
         todo.setLeiras(leiras);
+
+        if(hatarido != null && !hatarido.isEmpty()){
+            todo.setHatarido(java.time.LocalDateTime.parse(hatarido));
+        }
         todoRepository.save(todo);
 
         if (email != null && !email.isEmpty()) {
@@ -37,7 +42,7 @@ public class TodoController {
         }
 
         try {
-            googleNaptarSzolgaltatas.addNaptarEsemeny(cim, leiras);
+            googleNaptarSzolgaltatas.addNaptarEsemeny(cim, leiras,todo.getHatarido());
         } catch (Exception e) {
             System.out.println("Naptár hiba: " + e.getMessage());
         }

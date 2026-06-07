@@ -28,4 +28,9 @@ public class Todo {
 
     public boolean isKesz() { return kesz; }
     public void setKesz(boolean kesz) { this.kesz = kesz; }
+
+    // Dátum és határidő
+    private java.time.LocalDateTime hatarido;
+    public java.time.LocalDateTime getHatarido() { return hatarido; }
+    public void setHatarido(java.time.LocalDateTime hatarido) { this.hatarido = hatarido; }
 }
