@@ -4,43 +4,70 @@
     <meta charset="UTF-8">
     <title>Teendőlista</title>
     <style>
-        body{ font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto;}
-        input{ padding: 8px; margin: 5px; width:200px;}
-        button { padding: 8px 16px; background:#4CAF50; color: white; border: none; cursor: pointer;}
-        table { width: 100%; border-collapse: collapse; margin-top:20px;}
-        th, td { padding: 10px; border: 1px solid #ddd; text-align: left;}
-        a { color: red, text-decoration: none;}
-        .kesz{ text-decoration:line-through; color: gray;}
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; }
+        input, select { padding: 8px; margin: 5px; width: 200px; }
+        button { padding: 8px 16px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+        a { color: red; text-decoration: none; }
+        .kesz { text-decoration: line-through; color: gray; }
+        h2 { margin-top: 30px; }
     </style>
 </head>
 <body>
-    <h1>Teendőlista</h1>
-    <form action="/hozzaad" method = "post">
-        <input type="text" name="cim" placeholder="Teendő címe" required/>
-        <input type="text" name="leiras" placeholder="Teendő leírása"/>
-        <input type="email" name="email" placeholder="Értesítendő email cím/">
-        <input type="datetime-local" name="hatarido"/>
-        <button type="submit">Hozzáad</button>
-    </form>
+<h1>Teendőlista</h1>
 
-    <table>
-        <tr>
-            <th>Cím</th>
-            <th>Leírás</th>
-            <th>Határidő</th>
-            <th>Kész</th>
-            <th>Műveletek</th>
-        </tr>
-        <tr th:each="todo : ${todok}">
-            <td th:text="${todo.cim}" th:class="${todo.kesz} ? 'kész' : ''"></td>
-            <td th:text="${todo.leiras}"></td>
-            <td th:text="${todo.hatarido != null} ? ${todo.hatarido.toString().replace('T', ' ').substring(0, 16)} : 'Nincs határidő'"></td>
-            <td th:text="${todo.kesz} ? 'igen' : 'nem'"></td>
-            <td>
-                <a th:href ="@{/torol/{id}(id=${todo.id})}">Törlés</a>
-                <a th:href="@{/kesz/{id}(id=${todo.id})}">Kész</a>
-            </td>
-        </tr>
-    </table>
+<h2>Új teendő</h2>
+<form action="/hozzaad" method="post">
+    <input type="text" name="cim" placeholder="Teendő címe" required/>
+    <input type="text" name="leiras" placeholder="Leírás"/>
+    <input type="email" name="email" placeholder="Email cím"/>
+    <input type="datetime-local" name="hatarido"/>
+    <select name="csoportId">
+        <option value="">-- Nincs csoport --</option>
+        <option th:each="csoport : ${csoportok}" th:value="${csoport.id}" th:text="${csoport.nev}"></option>
+    </select>
+    <button type="submit">Hozzáad</button>
+</form>
+
+<table>
+    <tr>
+        <th>Cím</th>
+        <th>Leírás</th>
+        <th>Határidő</th>
+        <th>Kész</th>
+        <th>Műveletek</th>
+    </tr>
+    <tr th:each="todo : ${todok}">
+        <td th:text="${todo.cim}" th:class="${todo.kesz} ? 'kesz' : ''"></td>
+        <td th:text="${todo.leiras}"></td>
+        <td th:text="${todo.hatarido != null} ? ${todo.hatarido.toString().replace('T', ' ').substring(0, 16)} : 'Nincs határidő'"></td>
+        <td th:text="${todo.kesz} ? 'igen' : 'nem'"></td>
+        <td>
+            <a th:href="@{/kesz/{id}(id=${todo.id})}">Kész</a> |
+            <a th:href="@{/torol/{id}(id=${todo.id})}">Törlés</a>
+        </td>
+    </tr>
+</table>
+
+<h2>Csoportok</h2>
+<form action="/csoport/hozzaad" method="post">
+    <input type="text" name="nev" placeholder="Csoport neve" required/>
+    <input type="text" name="emailek" placeholder="email1@x.com,email2@x.com"/>
+    <button type="submit">Csoport létrehozása</button>
+</form>
+
+<table>
+    <tr>
+        <th>Csoport neve</th>
+        <th>Email címek</th>
+        <th>Törlés</th>
+    </tr>
+    <tr th:each="csoport : ${csoportok}">
+        <td th:text="${csoport.nev}"></td>
+        <td th:text="${csoport.emailCimek}"></td>
+        <td><a th:href="@{/csoport/torol/{id}(id=${csoport.id})}">Törlés</a></td>
+    </tr>
+</table>
 </body>
 </html>
